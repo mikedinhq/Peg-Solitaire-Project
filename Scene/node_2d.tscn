@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://chv11gd05sinx"]
+
+[ext_resource type="Script" uid="uid://08kcnk3jjifr" path="res://Scripts/control.gd" id="1_romgu"]
+
+[node name="Main" type="Node2D" unique_id=1818098743]
+
+[node name="Control" type="Control" parent="." unique_id=1353887368]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 493.0
+offset_bottom = 272.0
+script = ExtResource("1_romgu")
+metadata/_edit_use_anchors_ = true
+
+[node name="Radio_Buttons" type="Control" parent="Control" unique_id=949180788]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Radio1" type="CheckBox" parent="Control/Radio_Buttons" unique_id=214744786]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 4.525
+anchor_top = 0.925
+anchor_right = 4.675
+anchor_bottom = 0.925
+offset_top = 55.0
+offset_right = 75.0
+offset_bottom = 86.0
+text = "Radio1"
+metadata/_edit_use_anchors_ = true
+
+[node name="Radio2" type="CheckBox" parent="Control/Radio_Buttons" unique_id=1434510780]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 4.525
+anchor_top = 1.475
+anchor_right = 4.675
+anchor_bottom = 1.475
+offset_top = 55.0
+offset_right = 75.0
+offset_bottom = 86.0
+text = "Radio2"
+metadata/_edit_use_anchors_ = true
+
+[node name="Radio3" type="CheckBox" parent="Control/Radio_Buttons" unique_id=833580382]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 4.5
+anchor_top = 2.0
+anchor_right = 4.65
+anchor_bottom = 2.0
+offset_top = 55.0
+offset_right = 75.0
+offset_bottom = 86.0
+text = "Radio3"
+metadata/_edit_use_anchors_ = true
+
+[node name="Label" type="Label" parent="Control" unique_id=59647207]
+layout_mode = 0
+offset_left = 3.0
+offset_right = 99.0
+offset_bottom = 23.0
+text = "Peg Solitaire"
+metadata/_edit_use_anchors_ = true
+
+[node name="CheckButton" type="CheckButton" parent="Control" unique_id=1391280581]
+layout_mode = 0
+offset_left = -3.0
+offset_top = 34.0
+offset_right = 41.0
+offset_bottom = 58.0
+metadata/_edit_use_anchors_ = true
+
+[node name="Button1" type="Button" parent="Control" unique_id=1559478601]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0020283975
+anchor_top = 0.033088237
+anchor_right = 0.06693712
+anchor_bottom = 0.15441176
+offset_left = 5.0
+offset_top = 81.0
+offset_right = 83.0
+offset_bottom = 89.0
+text = "1"
+metadata/_edit_use_anchors_ = true
+
+[node name="Button2" type="Button" parent="Control" unique_id=937592794]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0020283975
+anchor_top = 0.15441176
+anchor_right = 0.06693712
+anchor_bottom = 0.2757353
+offset_left = 5.0
+offset_top = 96.0
+offset_right = 83.0
+offset_bottom = 104.0
+text = "2"
+metadata/_edit_use_anchors_ = true
+
+[node name="Button3" type="Button" parent="Control" unique_id=506072018]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.0020283975
+anchor_top = 0.27941176
+anchor_right = 0.06896552
+anchor_bottom = 0.4007353
+offset_left = 5.0
+offset_top = 110.0
+offset_right = 83.0
+offset_bottom = 118.0
+text = "3"
+metadata/_edit_use_anchors_ = true
+
+[connection signal="toggled" from="Control/Radio_Buttons/Radio1" to="Control" method="_on_radio_toggled" binds= ["1", "Radio1"]]
+[connection signal="toggled" from="Control/Radio_Buttons/Radio2" to="Control" method="_on_radio_toggled" binds= ["2", "Radio2"]]
+[connection signal="toggled" from="Control/Radio_Buttons/Radio3" to="Control" method="_on_radio_toggled" binds= ["3", "Radio3"]]
+[connection signal="toggled" from="Control/CheckButton" to="Control" method="_on_check_button_toggled" binds= ["CheckButton"]]
+[connection signal="pressed" from="Control/Button1" to="Control" method="_on_button1_pressed"]
+[connection signal="pressed" from="Control/Button2" to="Control" method="_on_button2_pressed"]
+[connection signal="pressed" from="Control/Button3" to="Control" method="_on_button3_pressed"]
