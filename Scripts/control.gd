@@ -1,44 +1,36 @@
 extends Control
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	var group:= ButtonGroup.new()
-	for i in $Radio_Buttons.get_children():
-		if i is BaseButton:
-			i.button_group = group
-			i.toggle_mode = true
-			i.toggled.connect(_on_radio_toggled.bind(i.name))
+@onready var board_selection = $Board
+@onready var board_type_menu = $Board_Type_Selection
+@onready var board_size_menu = $Board_Size_Selection
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
 
+var board_type
+var board_size: int
+var default_board_type = "English"
+var default_board_size = 5
 
-func _on_button1_pressed() -> void:
-	print("Button1 pressed")
-	pass # Replace with function body.
+func _on_board_type_selection_item_selected(index: int) -> void:
+	board_selection.delete_board()
+	board_type = $Board_Type_Selection.get_item_text(index)   # no var
+	#print("TYPE handler: board_type='%s' board_size=%s" % [board_type, board_size])
+	board_selection._choose_board(board_selection, $Board_Type_Selection.get_item_text(index), board_size)
 
+func _on_board_size_selection_item_selected(index: int) -> void:
+	board_selection.delete_board()
+	board_size = $Board_Size_Selection.get_item_id(index)
+	#print("SIZE handler: board_type='%s' board_size=%s" % [board_type, board_size])
+	board_selection._choose_board(board_selection, board_type, $Board_Size_Selection.get_item_id(index))
 
-func _on_button2_pressed() -> void:
-	print("Button2 pressed")
-	pass # Replace with function body.
+func _on_new_game_pressed() -> void:
+	board_selection.delete_board()
+	board_selection._choose_board(board_selection, board_type, board_size)
+	
+func _check_valid_move(move):
+	pass
 
-
-func _on_button3_pressed() -> void:
-	print("Button3 pressed")
-	pass # Replace with function body.
-
-
-func _on_radio_toggled(toggled_on: bool, _extra_arg_0: String, _extra_arg_1: String) -> void:
-	if toggled_on:
-		print(_extra_arg_1 + ": true")
-	else:
-		print(_extra_arg_1 + ": false")
-
-
-func _on_check_button_toggled(toggled_on: bool, extra_arg_0: String) -> void:
-	if toggled_on:
-		print(extra_arg_0 + ": true")
-	else:
-		print(extra_arg_0 + ": false")
-	pass # Replace with function body.
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # add_theme_stylebox_override("panel", stylebox)
