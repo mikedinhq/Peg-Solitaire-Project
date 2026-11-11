@@ -2,8 +2,6 @@
 extends GutTest
 
 # Preload the script/class you want to test
-const BoardGame = preload("res://Scripts/game_setup.gd")
-
 var game: BoardGame
 
 # Runs before EACH test to give a fresh instance
@@ -25,7 +23,7 @@ func test_invalid_board_size_is_rejected() -> void:
 	var result = game.set_board_size(-1)
 	assert_false(result, "Negative board size should be rejected")
 
-# --- 2. Start a new game of the chosen board size and type ---
+ #--- 2. Start a new game of the chosen board size and type ---
 
 func test_start_new_game_initializes_correct_state() -> void:
 	game.set_board_size(5)

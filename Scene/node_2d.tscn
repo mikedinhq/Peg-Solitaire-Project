@@ -14,6 +14,20 @@ offset_bottom = 272.0
 script = ExtResource("1_romgu")
 metadata/_edit_use_anchors_ = true
 
+[node name="Randomize" type="Button" parent="Control" unique_id=882453326]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -0.030426087
+anchor_top = 2.9564075
+anchor_right = 0.07099367
+anchor_bottom = 3.0777311
+offset_left = 929.00006
+offset_top = -533.1429
+offset_right = 1007.0001
+offset_bottom = -525.1429
+text = "Randomize"
+metadata/_edit_use_anchors_ = true
+
 [node name="Title" type="Label" parent="Control" unique_id=59647207]
 modulate = Color(0, 0, 0, 1)
 layout_mode = 1
@@ -23,12 +37,20 @@ anchor_top = 0.16544117
 anchor_right = 1.0588236
 anchor_bottom = 0.24632353
 offset_left = 3.0
-offset_right = 99.0
+offset_right = 110.05884
 offset_bottom = 23.0
 text = "PEG SOLITAIRE"
 horizontal_alignment = 1
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
+
+[node name="Autoplay" type="CheckButton" parent="Control" unique_id=1878661288]
+layout_mode = 0
+offset_left = 920.0
+offset_top = 192.0
+offset_right = 1038.0
+offset_bottom = 223.0
+text = "Autoplay"
 
 [node name="Board_Size_Selection" type="OptionButton" parent="Control" unique_id=643748944]
 layout_mode = 0
@@ -59,9 +81,9 @@ popup/item_0/text = "Choose Board Type"
 popup/item_0/id = 6
 popup/item_1/text = "English"
 popup/item_1/id = 5
-popup/item_2/text = "Square"
+popup/item_2/text = "Hexagon"
 popup/item_2/id = 0
-popup/item_3/text = "Triangle"
+popup/item_3/text = "Diamond"
 popup/item_3/id = 2
 
 [node name="New_Game" type="Button" parent="Control" unique_id=1559478601]
@@ -82,10 +104,10 @@ metadata/_edit_use_anchors_ = true
 modulate = Color(0.45392704, 0.45837176, 0.4705568, 1)
 self_modulate = Color(0.8845111, 0.87419873, 0.8733222, 1)
 anchors_preset = 0
-offset_left = 298.0
-offset_top = 179.0
-offset_right = 338.0
-offset_bottom = 219.0
+offset_left = 310.0
+offset_top = 277.0
+offset_right = 470.0
+offset_bottom = 350.0
 script = ExtResource("2_vtyw1")
 
 [node name="Panel" type="Panel" parent="Control" unique_id=628344152]
@@ -96,10 +118,31 @@ offset_top = 111.0
 offset_right = 1082.0
 offset_bottom = 626.0
 
+[node name="Title" type="Label" parent="Control/Panel" unique_id=368676752]
+layout_mode = 0
+offset_left = 362.0
+offset_top = 45.0
+offset_right = 625.0
+offset_bottom = 99.0
+text = "GAME OVER"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Replay" type="Button" parent="Control/Panel" unique_id=1632061587]
+layout_mode = 0
+offset_left = 440.0
+offset_top = 126.0
+offset_right = 549.0
+offset_bottom = 151.0
+text = "Play Again"
+
 [node name="GutTest" type="Node" parent="Control" unique_id=209388307]
 script = ExtResource("3_gj2p5")
 metadata/_custom_type_script = "uid://cnup2nbj45r4s"
 
+[connection signal="pressed" from="Control/Randomize" to="Control" method="_on_randomize_pressed"]
+[connection signal="toggled" from="Control/Autoplay" to="Control" method="_on_autoplay_toggled"]
 [connection signal="item_selected" from="Control/Board_Size_Selection" to="Control" method="_on_board_size_selection_item_selected"]
 [connection signal="item_selected" from="Control/Board_Type_Selection" to="Control" method="_on_board_type_selection_item_selected"]
 [connection signal="pressed" from="Control/New_Game" to="Control" method="_on_new_game_pressed"]
+[connection signal="pressed" from="Control/Panel/Replay" to="Control" method="_on_replay_pressed"]
