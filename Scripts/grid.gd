@@ -190,7 +190,7 @@ func start_autoplay() -> void:
 func _on_autoplay_tick() -> void:
 	if model.is_game_over():
 		autoplay_timer.stop()
-		$"../GameOverPanel"
+		$"../GameOverPanel".show()
 		$"../Autoplay".button_pressed = false
 		print("Autoplay finished!")
 		return
