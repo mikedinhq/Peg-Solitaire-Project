@@ -4,3 +4,5 @@ For the GUT add on u must install from the asset library on the top of the scree
 To use, click the GUT button on the bottom middle of the window and click run all
 
 To try the gui, press f5 or the button next to the Asset store 
+
+For Sprint 3, the GUT add-on is mandatory to run the program
