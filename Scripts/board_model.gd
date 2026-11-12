@@ -7,6 +7,19 @@ enum CellState { EMPTY, FILLED }
 var cell_state: Dictionary = {}
 var board_cells: Array[Vector2i] = []
 var is_hex: bool = false
+var Peg_label: Label
+
+const HEX_DIRS = [
+	Vector2i(1, 0),
+	Vector2i(1, -1),
+	Vector2i(0, -1),
+	Vector2i(-1, 0),
+	Vector2i(-1, 1),
+	Vector2i(0, 1)
+]
+
+static func get_hex_directions():
+	return HEX_DIRS
 
 #region Getters
 # hexagonal board configuration check
@@ -97,4 +110,3 @@ func count_pegs() -> int:
 		if state == CellState.FILLED:
 			count += 1
 	return count
-	

@@ -201,10 +201,10 @@ func _on_autoplay_tick() -> void:
 					get_button(from_cell).set_pressed_no_signal(false)
 					get_button(to_cell).set_pressed_no_signal(false)
 					return # Exit and wait for the next timer tick
-	
+
 func get_button(cell: Vector2i) -> Button:
 	return get_node_or_null("Cell_%d_%d" % [cell.x + 100, cell.y + 100]) as Button
-	
+
 func _ready() -> void:
 	# Setup a timer for autoplay
 	autoplay_timer = Timer.new()

@@ -1,17 +1,5 @@
 class_name BoardShapes
 
-const HEX_DIRS = [
-	Vector2i(1, 0),
-	Vector2i(1, -1),
-	Vector2i(0, -1),
-	Vector2i(-1, 0),
-	Vector2i(-1, 1),
-	Vector2i(0, 1)
-]
-
-static func get_hex_directions():
-	return HEX_DIRS
-
 static func _rect_to_pixel(row: int, col: int, btn_size: Vector2, spacing: Vector2) -> Vector2:
 	return Vector2(	col * (btn_size.x + spacing.x), row * (btn_size.y + spacing.y))
 
