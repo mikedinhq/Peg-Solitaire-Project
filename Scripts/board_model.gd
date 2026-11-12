@@ -9,18 +9,6 @@ var board_cells: Array[Vector2i] = []
 var is_hex: bool = false
 var Peg_label: Label
 
-const HEX_DIRS = [
-	Vector2i(1, 0),
-	Vector2i(1, -1),
-	Vector2i(0, -1),
-	Vector2i(-1, 0),
-	Vector2i(-1, 1),
-	Vector2i(0, 1)
-]
-
-static func get_hex_directions():
-	return HEX_DIRS
-
 #region Getters
 # hexagonal board configuration check
 func get_hex():
@@ -64,8 +52,14 @@ func set_filled(cell: Vector2i) -> void:
 func jump_destinations(cell: Vector2i) -> Array[Vector2i]:
 	var dests: Array[Vector2i] = []
 	if is_hex:
-		for dir in BoardModel.HEX_DIRS:
-			dests.append(cell + dir * 2)
+		dests = [
+			cell + Vector2i(2, 0),
+			cell + Vector2i(2, -2),
+			cell + Vector2i(0, -2),
+			cell + Vector2i(-2, 0),
+			cell + Vector2i(-2, 2),
+			cell + Vector2i(0, 2)
+		]
 	else:
 		dests = [
 			cell + Vector2i(0,-2),
