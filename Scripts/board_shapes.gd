@@ -9,7 +9,7 @@ static func _hex_to_pixel(q: int, r: int, btn_size: Vector2) -> Vector2:
 		size * sqrt(5.0) * (q + r / 2.0),
 		size * 2 * r
 	)
-	
+
 static func diamond_board(diameter: int) -> Array[Vector2i]:
 	diameter /= 2
 	var cells: Array[Vector2i] = []
@@ -46,6 +46,3 @@ static func hexagon_board(radius: int) -> Array[Vector2i]:
 			if abs(q) + abs(r) + abs(q + r) <= 2 * radius:
 				cells.append(Vector2i(q, r))
 	return cells
-	
-static func rect_to_pixel(row: int, col: int, btn_size: Vector2, spacing: Vector2) -> Vector2:
-	return Vector2(col * (btn_size.x + spacing.x), row * (btn_size.y + spacing.y))
