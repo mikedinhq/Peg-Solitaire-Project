@@ -94,17 +94,6 @@ func get_cell_color(cell: Vector2i) -> Color:
 	var style = btn.get_theme_stylebox("normal") as StyleBoxFlat
 	return style.bg_color if style else Color.TRANSPARENT
 
-
-#func restore_cell_color(cell: Vector2i) -> void:
-	#var base := Color.BLACK 
-	#if not model.has_cell_key(cell):
-		#return
-	#if model.is_filled(cell):
-		#pass
-	#else:
-		#base = Color.WHITE
-	#set_cell_color(cell, base)
-
 func print_cell(cell: Vector2i) -> void:
 	if not model.has_cell_key(cell):
 		print("Cell ", cell, " : INVALID (not on board)")
