@@ -1,104 +1,78 @@
-# test_board_game.gd
 extends GutTest
 
-# Preload the script/class you want to test
-var game: BoardGame
+var model
 
-# Runs before EACH test to give a fresh instance
-func before_each() -> void:
-	game = autofree(BoardGame.new())
+# initialize class for methods
+func before_each():
+	model = BoardModel.new()
 
-# --- 1. Choose board size and type ---
-
-func test_can_select_board_size() -> void:
-	game.set_board_size(8)
-	assert_eq(game.board_size, 8, "Board size should be set to 8")
-
-func test_can_select_board_type() -> void:
-	game.set_board_type("hex")
-	assert_eq(game.board_type, "hex", "Board type should be 'hex'")
-
-func test_invalid_board_size_is_rejected() -> void:
-	# Example: assuming negative or zero sizes are invalid
-	var result = game.set_board_size(-1)
-	assert_false(result, "Negative board size should be rejected")
-
- #--- 2. Start a new game of the chosen board size and type ---
-
-func test_start_new_game_initializes_correct_state() -> void:
-	game.set_board_size(5)
-	game.set_board_type("square")
-	game.start_new_game()
+# tests the setup of the cells
+func test_setup_initializes_board_correctly():
+	var cells: Array[Vector2i] = [Vector2i(0,0), Vector2i(0,1)]
+	model.setup(cells, false)
 	
-	assert_true(game.is_game_active, "Game should be marked as active")
-	assert_eq(game.current_turn, 1, "Game should start on turn 1")
-	assert_eq(game.board.size(), 25, "5x5 board should have 25 tiles")
+	assert_eq(model.get_board_cells().size(), 2, "Should store 2 cells")
+	assert_true(model.is_filled(Vector2i(0,0)), "Cells should be filled by default")
+	assert_false(model.get_hex(), "Should not be in hex mode")
 
-func test_start_new_game_clears_previous_state() -> void:
-	# Simulate a dirty state
-	game.board = [1, 2, 3]
-	game.current_turn = 5
+# tests valid moves
+func test_can_move_valid_jump_square():
+	# Setup 3 cells in a line: [Peg] -> [Peg] -> [Empty]
+	var cells: Array[Vector2i] = [Vector2i(0,0), Vector2i(0,1), Vector2i(0,2)]
+	model.setup(cells, false)
+	model.set_empty(Vector2i(0,2)) # Make the destination empty
 	
-	game.start_new_game()
-	
-	assert_ne(game.current_turn, 5, "Turn should reset on new game")
-	# Depending on implementation, board might be regenerated or cleared
-	assert_ne(game.board.size(), 3, "Old board data should be discarded")
+	# Jump from (0,0) over (0,1) to (0,2)
+	assert_true(model.can_move(Vector2i(0,0), Vector2i(0,2)), "Should be a valid jump")
 
-# --- 3. Making a move ---
+# tests invalid move (adjacent cell is empty)
+func test_cannot_move_if_midpoint_is_empty():
+	var cells: Array[Vector2i] = [Vector2i(0,0), Vector2i(0,1), Vector2i(0,2)]
+	model.setup(cells, false)
+	model.set_empty(Vector2i(0,1)) # Empty the middle
+	model.set_empty(Vector2i(0,2)) # Empty the destination
+	
+	assert_false(model.can_move(Vector2i(0,0), Vector2i(0,2)), "Cannot jump over an empty space")
 
-func test_making_a_valid_move_updates_board() -> void:
-	game.set_board_size(3)
-	game.start_new_game()
+# test invalid move (out of bound move)
+func test_cannot_move_out_of_bounds():
+	var cells: Array[Vector2i] = [Vector2i(0,0), Vector2i(0,1)]
+	model.setup(cells, false)
+	model.set_empty(Vector2i(0,1))
 	
-	# Assuming move_piece returns true on success and updates a cell
-	var success = game.make_move(Vector2i(1, 1), "player_1")
-	
-	assert_true(success, "Valid move should return true")
-	assert_eq(game.get_piece_at(Vector2i(1, 1)), "player_1", "Board should reflect the moved piece")
+	# Trying to jump to (0,2) which doesn't exist
+	assert_false(model.can_move(Vector2i(0,0), Vector2i(0,2)), "Cannot jump off the board")
 
-func test_making_an_invalid_move_is_rejected() -> void:
-	game.set_board_size(3)
-	game.start_new_game()
+# tests making the moves and updating the board based on that
+func test_execute_move_updates_state():
+	var cells: Array[Vector2i] = [Vector2i(0,0), Vector2i(0,1), Vector2i(0,2)]
+	model.setup(cells, false)
+	model.set_empty(Vector2i(0,2))
 	
-	# Example: moving to an occupied space or out of bounds
-	game.make_move(Vector2i(1, 1), "player_1")
-	var second_move = game.make_move(Vector2i(1, 1), "player_2")
-	var third_move = game.make_move(Vector2i(4,4), "player_1")
+	model.execute_move(Vector2i(0,0), Vector2i(0,2))
 	
-	assert_false(second_move, "Cannot move to an occupied position")
-	
-func test_making_a_move_advances_turn() -> void:
-	game.set_board_size(3)
-	game.start_new_game()
-	
-	game.make_move(Vector2i(0, 0), "player_1")
-	
-	assert_eq(game.current_turn, 2, "Turn should advance after a move")
+	assert_true(model.is_empty(Vector2i(0,0)), "From cell should be empty")
+	assert_true(model.is_empty(Vector2i(0,1)), "Mid cell should be empty")
+	assert_true(model.is_filled(Vector2i(0,2)), "To cell should be filled")
 
-# --- 4. Checking the end of game ---
+# tests the hexagon board and valid directions
+func test_hex_directions():
+	var cells: Array[Vector2i] = [Vector2i(0,0), Vector2i(1,0), Vector2i(2,0)]
+	model.setup(cells, true) # True = Hex mode
+	model.set_empty(Vector2i(2,0))
+	
+	# In hex axial, (1,0) is a valid direction, so a jump from (0,0) to (2,0) should work
+	assert_true(model.can_move(Vector2i(0,0), Vector2i(2,0)), "Should be valid hex jump")
 
-func test_game_is_not_over_at_start() -> void:
-	game.start_new_game()
-	assert_false(game.is_game_over(), "Game should not be over immediately")
-
-func test_game_over_when_win_condition_met() -> void:
-	# Example: assume a 3x3 board where filling a row ends the game
-	game.set_board_size(3)
-	game.start_new_game()
+# tests game over detection
+func test_game_over_detection():
+	# 1 peg, no moves possible = Game Over
+	var cells: Array[Vector2i] = [Vector2i(0,0)]
+	model.setup(cells, false)
+	assert_true(model.is_game_over(), "Game should be over with 1 isolated peg")
 	
-	# Simulate a winning sequence
-	game.make_move(Vector2i(0, 0), "player_1")
-	game.make_move(Vector2i(0, 1), "player_1")
-	game.make_move(Vector2i(0, 2), "player_1")
-	
-	assert_true(game.is_game_over(), "Game should end when a player wins")
-
-func test_game_over_on_draw() -> void:
-	# Example: 1x1 board fills up immediately
-	game.set_board_size(1)
-	game.start_new_game()
-	
-	game.make_move(Vector2i(0, 0), "player_1")
-	
-	assert_true(game.is_game_over(), "Full board with no winner should be a draw")
+	# Valid move exists = Not Game Over
+	var cells2: Array[Vector2i] = [Vector2i(0,0), Vector2i(0,1), Vector2i(0,2)]
+	model.setup(cells2, false)
+	model.set_empty(Vector2i(0,2))
+	assert_false(model.is_game_over(), "Game should not be over if a move exists")

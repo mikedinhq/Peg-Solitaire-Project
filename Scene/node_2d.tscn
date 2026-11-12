@@ -110,7 +110,7 @@ offset_right = 470.0
 offset_bottom = 350.0
 script = ExtResource("2_vtyw1")
 
-[node name="Panel" type="Panel" parent="Control" unique_id=628344152]
+[node name="GameOverPanel" type="Panel" parent="Control" unique_id=628344152]
 visible = false
 layout_mode = 0
 offset_left = 51.0
@@ -118,7 +118,7 @@ offset_top = 111.0
 offset_right = 1082.0
 offset_bottom = 626.0
 
-[node name="Title" type="Label" parent="Control/Panel" unique_id=368676752]
+[node name="GameOverTitle" type="Label" parent="Control/GameOverPanel" unique_id=368676752]
 layout_mode = 0
 offset_left = 362.0
 offset_top = 45.0
@@ -128,12 +128,21 @@ text = "GAME OVER"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Replay" type="Button" parent="Control/Panel" unique_id=1632061587]
+[node name="Pegs" type="Label" parent="Control/GameOverPanel" unique_id=1783171196]
+layout_mode = 0
+offset_left = 363.0
+offset_top = 107.0
+offset_right = 626.0
+offset_bottom = 161.0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Replay" type="Button" parent="Control/GameOverPanel" unique_id=1632061587]
 layout_mode = 0
 offset_left = 440.0
-offset_top = 126.0
+offset_top = 179.0
 offset_right = 549.0
-offset_bottom = 151.0
+offset_bottom = 210.0
 text = "Play Again"
 
 [node name="GutTest" type="Node" parent="Control" unique_id=209388307]
@@ -145,4 +154,4 @@ metadata/_custom_type_script = "uid://cnup2nbj45r4s"
 [connection signal="item_selected" from="Control/Board_Size_Selection" to="Control" method="_on_board_size_selection_item_selected"]
 [connection signal="item_selected" from="Control/Board_Type_Selection" to="Control" method="_on_board_type_selection_item_selected"]
 [connection signal="pressed" from="Control/New_Game" to="Control" method="_on_new_game_pressed"]
-[connection signal="pressed" from="Control/Panel/Replay" to="Control" method="_on_replay_pressed"]
+[connection signal="pressed" from="Control/GameOverPanel/Replay" to="Control" method="_on_replay_pressed"]
