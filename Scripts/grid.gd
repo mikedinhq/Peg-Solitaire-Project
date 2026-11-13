@@ -9,7 +9,7 @@ var shapes := BoardShapes.new()
 var model := BoardModel.new()
 var valid_targets: Array[Vector2i] = []
 var highlighted: Array[Vector2i] = []
-var selected := Vector2i(-1, -1)   # (-1,-1) = nothing selected
+var selected := Vector2i(-100, -100)   # (-1,-1) = nothing selected
 
 var autoplay_timer: Timer
 
@@ -129,13 +129,14 @@ func is_valid_target(cell: Vector2i) -> bool:
 func clear_selection() -> void:
 	clear_highlights()
 	valid_targets.clear()
-	selected = Vector2i(-1, -1)
+	selected = Vector2i(-100, -100)
 
 func _on_cell_clicked(toggled_on: bool, row: int, col: int) -> void:
 	var cell := Vector2i(row, col)
+	print(cell)
 
 	# 1. Execute the move if clicking a valid target
-	if selected != Vector2i(-1, -1) and cell in valid_targets:
+	if selected != Vector2i(-100, -100) and cell in valid_targets:
 		var from_cell = selected
 		var mid_cell = (from_cell + cell) / 2
 		model.execute_move(selected, cell)
@@ -167,18 +168,23 @@ func _on_cell_clicked(toggled_on: bool, row: int, col: int) -> void:
 		if btn:
 			btn.set_pressed_no_signal(false)
 	
-	
 
 func randomize_board():
 	clear_selection()
 	
 	for cell in model.get_board_cells():
-		model.set_filled(cell)
+		var random = randi_range(1, 100)
+		if random >= 30:
+			model.set_filled(cell)
+		else:
+			model.set_empty(cell)
+		update_cell_visual(cell)
 		
 	if model.board_cells.size() > 0:
 		var random_index = randi() % model.board_cells.size()
 		var empty_cell = model.board_cells[random_index]
 		model.set_empty(empty_cell)
+		update_cell_visual(empty_cell)
 
 func start_autoplay() -> void:
 	autoplay_timer.start()
