@@ -82,6 +82,7 @@ func execute_move(from: Vector2i, to: Vector2i) -> void:
 	set_empty(from)
 	set_empty((from + to) / 2)
 	set_filled(to)
+	is_game_over()
 
 # game over detection
 func is_game_over() -> bool:

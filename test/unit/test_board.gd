@@ -8,12 +8,21 @@ func before_each():
 
 # tests the setup of the cells
 func test_setup_initializes_board_correctly():
-	var cells: Array[Vector2i] = [Vector2i(0,0), Vector2i(0,1)]
+	var cells: Array[Vector2i] = [
+		Vector2i(0,0),
+		Vector2i(0,1),
+		Vector2i(1,0),
+		Vector2i(1,1),
+		]
 	model.setup(cells, false)
 	
-	assert_eq(model.get_board_cells().size(), 2, "Should store 2 cells")
+	assert_eq(model.get_board_cells().size(), 4, "Should store 2 cells")
 	assert_true(model.is_filled(Vector2i(0,0)), "Cells should be filled by default")
 	assert_false(model.get_hex(), "Should not be in hex mode")
+
+func test_board_size():
+	var cells = model.english_board(5)
+	assert_eq(cells.size(), 21)
 
 # tests valid moves
 func test_can_move_valid_jump_square():

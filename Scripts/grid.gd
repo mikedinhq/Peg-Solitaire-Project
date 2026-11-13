@@ -1,5 +1,7 @@
 extends Control
 
+@onready var game_over_panel: Control = $"../GameOverPanel"
+@onready var autoplay_button: Button = $"../Autoplay"
 @export var button_size := Vector2(32, 32)
 @export var spacing := Vector2(8, 8)
 
@@ -147,13 +149,16 @@ func _on_cell_clicked(toggled_on: bool, row: int, col: int) -> void:
 		var btn = get_button(cell)
 		if btn:
 			btn.set_pressed_no_signal(false) 
+		_handle_game_over()
 		return
+		
+		
 
+		
 	# 2. Select a peg
 	if model.is_filled(cell):
 		selected = cell
 		show_moves(cell)
-		
 
 	else:
 		clear_selection()
@@ -161,6 +166,8 @@ func _on_cell_clicked(toggled_on: bool, row: int, col: int) -> void:
 		var btn = get_button(cell)
 		if btn:
 			btn.set_pressed_no_signal(false)
+	
+	
 
 func randomize_board():
 	clear_selection()
@@ -177,12 +184,7 @@ func start_autoplay() -> void:
 	autoplay_timer.start()
 
 func _on_autoplay_tick() -> void:
-	if model.is_game_over():
-		autoplay_timer.stop()
-		$"../GameOverPanel".show()
-		$"../Autoplay".button_pressed = false
-		print("Autoplay finished!")
-		return
+	_handle_game_over()
 		
 	# Find a valid move
 	for from_cell in model.get_board_cells():
@@ -205,6 +207,12 @@ func _on_autoplay_tick() -> void:
 func get_button(cell: Vector2i) -> Button:
 	return get_node_or_null("Cell_%d_%d" % [cell.x + 100, cell.y + 100]) as Button
 
+func _handle_game_over() -> void:
+	if model.is_game_over():
+		autoplay_timer.stop()
+		$"../GameOverPanel".show()
+		$"../Autoplay".button_pressed = false
+		
 func _ready() -> void:
 	# Setup a timer for autoplay
 	autoplay_timer = Timer.new()
