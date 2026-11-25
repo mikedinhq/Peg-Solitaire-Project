@@ -59,15 +59,19 @@ offset_top = 63.0
 offset_right = 432.0
 offset_bottom = 94.0
 selected = 0
-item_count = 4
+item_count = 6
 popup/item_0/text = "Choose Board Size"
-popup/item_0/id = 3
+popup/item_0/id = 1
 popup/item_1/text = "5"
-popup/item_1/id = 5
+popup/item_1/id = 2
 popup/item_2/text = "7"
-popup/item_2/id = 7
+popup/item_2/id = 3
 popup/item_3/text = "9"
-popup/item_3/id = 9
+popup/item_3/id = 4
+popup/item_4/text = "11"
+popup/item_4/id = 5
+popup/item_5/text = "13"
+popup/item_5/id = 6
 
 [node name="Board_Type_Selection" type="OptionButton" parent="Control" unique_id=1617378234]
 layout_mode = 0

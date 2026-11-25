@@ -2,14 +2,17 @@ extends Control
 
 @onready var game_over_panel: Control = $"../GameOverPanel"
 @onready var autoplay_button: Button = $"../Autoplay"
+@onready var replay_button = $"../GameOverPanel/Replay"
+@onready var peg_label = $"../GameOverPanel/Pegs"
 @export var button_size := Vector2(32, 32)
 @export var spacing := Vector2(8, 8)
+var buttons: Dictionary = {}
 
-var shapes := BoardShapes.new()
 var model := BoardModel.new()
 var valid_targets: Array[Vector2i] = []
 var highlighted: Array[Vector2i] = []
-var selected := Vector2i(-100, -100)   # (-1,-1) = nothing selected
+# (-100,-100) = nothing on the board selected will need to be bigger if board size has it
+var selected := Vector2i(-100, -100)   
 
 var autoplay_timer: Timer
 
@@ -23,7 +26,7 @@ func make_board(cells: Array[Vector2i], size: int, layout: String = 'rect') -> v
 		var btn = Button.new()
 		
 		# 1. Calculate Position
-		var pos = shapes._hex_to_pixel(cell.x, cell.y, button_size) if layout == "hex" else shapes._rect_to_pixel(cell.x, cell.y, button_size, spacing)
+		var pos = BoardShapes.hex_to_pixel(cell.x, cell.y, button_size) if layout == "hex" else BoardShapes.rect_to_pixel(cell.x, cell.y, button_size, spacing)
 		btn.position = pos - button_size / 2.0
 		
 		# 2. Setup Visuals
@@ -31,6 +34,7 @@ func make_board(cells: Array[Vector2i], size: int, layout: String = 'rect') -> v
 		btn.toggle_mode = true
 		btn.custom_minimum_size = button_size
 		add_child(btn)
+		buttons[cell] = btn
 		btn.toggled.connect(_on_cell_clicked.bind(cell.x, cell.y))
 		
 		# 3. Apply Initial Color
@@ -38,7 +42,7 @@ func make_board(cells: Array[Vector2i], size: int, layout: String = 'rect') -> v
 		
 	# sets the center cell/button as empty
 	# hexagonal positioning 
-	if model.get_hex() == true:
+	if model.is_hex:
 		model.set_empty(Vector2i(0,0))
 		set_cell_color(Vector2i(0,0), Color.WHITE)
 		print_cell(Vector2i(0,0))
@@ -51,24 +55,22 @@ func make_board(cells: Array[Vector2i], size: int, layout: String = 'rect') -> v
 # interfaces with the drop down menu on control.gd/the GUI script
 func _choose_board(type, size) -> void:
 	match type:
-		'English': make_board(model.english_board(size), size)
-		'Hexagon': make_board(model.hexagon_board(size), size, 'hex')
-		'Diamond': make_board(model.diamond_board(size), size)
+		'English': make_board(BoardShapes.english_board(size), size)
+		'Hexagon': make_board(BoardShapes.hexagon_board(size), size, 'hex')
+		'Diamond': make_board(BoardShapes.diamond_board(size), size)
 		_: print("Unknown board type or WIP board type")
 
 # erase board
 func delete_board() -> void:
-	#button_group = null
-	for child in get_children():
-		if child is Button:
-			child.free()
+	for btn in buttons.values():
+		btn.free()
+	buttons.clear()
 
 # updates color of board whenever called mostly on executing moves
 func update_cell_visual(cell: Vector2i) -> void:
 	if not model.is_valid(cell): return
 	var color = Color.BLACK if model.is_filled(cell) else Color.WHITE
 	set_cell_color(cell, color)
-
 
 # cell color setter
 func set_cell_color(cell: Vector2i, color: Color) -> void:
@@ -97,7 +99,7 @@ func get_cell_color(cell: Vector2i) -> Color:
 	return style.bg_color if style else Color.TRANSPARENT
 
 func print_cell(cell: Vector2i) -> void:
-	if not model.has_cell_key(cell):
+	if not model.is_valid(cell):
 		print("Cell ", cell, " : INVALID (not on board)")
 		return
 	if model.is_empty(cell):
@@ -118,9 +120,9 @@ func refresh_highlights() -> void:
 func show_moves(from: Vector2i) -> void:
 	clear_highlights()
 	valid_targets.clear()
-	for to in model.jump_destinations(from):
-		if model.can_move(from, to):
-			valid_targets.append(to)
+	for move in model.legal_moves():
+		if move[0] == from:
+			valid_targets.append(move[1])
 	refresh_highlights()
 
 func is_valid_target(cell: Vector2i) -> bool:
@@ -133,92 +135,81 @@ func clear_selection() -> void:
 
 func _on_cell_clicked(toggled_on: bool, row: int, col: int) -> void:
 	var cell := Vector2i(row, col)
-	print(cell)
 
 	# 1. Execute the move if clicking a valid target
 	if selected != Vector2i(-100, -100) and cell in valid_targets:
-		var from_cell = selected
-		var mid_cell = (from_cell + cell) / 2
-		model.execute_move(selected, cell)
+				
+		_apply_move([selected, cell])
 		clear_selection()
-		
-		update_cell_visual(from_cell)
-		update_cell_visual(mid_cell)
-		update_cell_visual(cell)
-		
-		# force clicked button to look unpressed
-		var btn = get_button(cell)
-		if btn:
-			btn.set_pressed_no_signal(false) 
+		_reset_toggle(cell)
 		_handle_game_over()
 		return
-		
-		
 
-		
 	# 2. Select a peg
 	if model.is_filled(cell):
 		selected = cell
 		show_moves(cell)
-
 	else:
 		clear_selection()
-		# Reset the visual state of the clicked empty cell
-		var btn = get_button(cell)
-		if btn:
-			btn.set_pressed_no_signal(false)
-	
+		_reset_toggle(cell)
 
-func randomize_board():
+func _apply_move(move: Array) -> void:
+	var from_cell: Vector2i = move[0]
+	var to_cell: Vector2i = move[1]
+	var mid_cell: Vector2i = model.mid_cell(from_cell, to_cell)
+	model.execute_move(from_cell, to_cell)
+	update_cell_visual(from_cell)
+	update_cell_visual(mid_cell)
+	update_cell_visual(to_cell)
+
+func randomize_board(probability):
 	clear_selection()
-	
+	model.randomize_cells(probability)
 	for cell in model.get_board_cells():
-		var random = randi_range(1, 100)
-		if random >= 30:
-			model.set_filled(cell)
-		else:
-			model.set_empty(cell)
 		update_cell_visual(cell)
-		
-	if model.board_cells.size() > 0:
-		var random_index = randi() % model.board_cells.size()
-		var empty_cell = model.board_cells[random_index]
-		model.set_empty(empty_cell)
-		update_cell_visual(empty_cell)
+
+func new_game(type: String, size: int) -> void:
+	delete_board()
+	_choose_board(type, size)
+
+func replay_function(type: String, size: int):
+	replay_button.set_pressed_no_signal(false)
+	game_over_panel.hide()
+	new_game(type, size)
 
 func start_autoplay() -> void:
 	autoplay_timer.start()
 
+func stop_autoplay() -> void:
+	autoplay_timer.stop()
+
 func _on_autoplay_tick() -> void:
-	_handle_game_over()
-		
-	# Find a valid move
-	for from_cell in model.get_board_cells():
-		if model.is_filled(from_cell):
-			for to_cell in model.jump_destinations(from_cell):
-				if model.can_move(from_cell, to_cell):
-					var mid_cell = (from_cell + to_cell) / 2
-					# Execute the move!
-					model.execute_move(from_cell, to_cell)
-					
-					update_cell_visual(from_cell)
-					update_cell_visual(mid_cell)
-					update_cell_visual(to_cell)
-					
-					# Reset toggle visuals for both cells
-					get_button(from_cell).set_pressed_no_signal(false)
-					get_button(to_cell).set_pressed_no_signal(false)
-					return # Exit and wait for the next timer tick
+	var moves := model.legal_moves()
+	if moves.is_empty():
+		_handle_game_over()
+		return
+	var move = moves.pick_random()
+	_apply_move(move)
+	
+	# 3. Reset the toggles that _apply_move doesn't already reset.
+	_reset_toggle(move[0])
+	_reset_toggle(move[1])
 
 func get_button(cell: Vector2i) -> Button:
-	return get_node_or_null("Cell_%d_%d" % [cell.x + 100, cell.y + 100]) as Button
+	return buttons.get(cell)
 
 func _handle_game_over() -> void:
 	if model.is_game_over():
 		autoplay_timer.stop()
-		$"../GameOverPanel".show()
-		$"../Autoplay".button_pressed = false
-		
+		game_over_panel.show()
+		autoplay_button.button_pressed = false
+		peg_label.text = "%d pegs left" % [model.count_pegs()]
+
+func _reset_toggle(cell: Vector2i) -> void:
+	var btn = get_button(cell)
+	if btn:
+		btn.set_pressed_no_signal(false)
+
 func _ready() -> void:
 	# Setup a timer for autoplay
 	autoplay_timer = Timer.new()
